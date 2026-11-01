@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f7f5ef">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Rihal">
+  <link rel="manifest" href="app.webmanifest">
+  <link rel="icon" type="image/svg+xml" href="rihal-icon.svg">
+  <link rel="apple-touch-icon" sizes="180x180" href="rihal-icon-180.png">
+  <title>رِحال — طلبات المكاتب</title>
+  <style>
+    :root {
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      color: #19333a;
+      background: #f7f5ef;
+      --ink: #19333a;
+      --teal: #176c68;
+      --teal-dark: #105551;
+      --muted: #72838a;
+      --line: #e6e8e2;
+      --paper: #fffefa;
+    }
+    * { box-sizing: border-box; }
+    body { min-width: 320px; min-height: 100vh; margin: 0; background: radial-gradient(ellipse at 8% 0%, #e6efeb 0, transparent 28rem), radial-gradient(ellipse at 96% 28%, #fae8dc 0, transparent 23rem), #f7f5ef; }
+    button, a { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, a:focus-visible { outline: 3px solid #176c6838; outline-offset: 2px; }
+    .page { width: min(1120px, calc(100% - 56px)); margin: auto; padding: 24px 0 48px; }
+    header { display: flex; align-items: center; justify-content: space-between; }
+    .brand { display: inline-flex; align-items: center; gap: 11px; color: var(--ink); text-decoration: none; }
+    .brand-icon { display: block; width: 48px; height: 48px; border-radius: 16px; box-shadow: 0 6px 16px #173c421f; }
+    .brand-name { display: block; font-size: 19px; font-weight: 800; letter-spacing: -.5px; }
+    .brand-tagline { display: block; margin-top: 2px; color: var(--muted); font-size: 11px; font-weight: 500; }
+    .actions { display: flex; gap: 8px; }
+    .button { display: inline-flex; min-height: 42px; align-items: center; justify-content: center; padding: 0 14px; border: 1px solid var(--line); border-radius: 13px; background: white; color: #52646b; font-size: 13px; font-weight: 650; text-decoration: none; transition: background .16s ease, transform .16s ease; }
+    .button:hover { transform: translateY(-1px); background: #f4f8f4; }
+    .button.primary { border-color: var(--teal); background: var(--teal); color: white; }
+    .button.primary:hover { background: var(--teal-dark); }
+    .intro { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin: 42px 0 24px; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 7px 11px; border: 1px solid #dce8df; border-radius: 30px; background: #f2f7f2; color: var(--teal); font-size: 12px; font-weight: 750; }
+    .eyebrow::before { width: 7px; height: 7px; border-radius: 50%; background: #72a58c; content: ""; }
+    h1 { margin: 12px 0 8px; color: var(--ink); font-size: clamp(32px, 5vw, 46px); letter-spacing: -1.2px; }
+    .intro p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.7; }
+    .count { flex: 0 0 auto; padding: 12px 16px; border: 1px solid #e5e5dd; border-radius: 14px; background: var(--paper); color: var(--teal); font-size: 13px; font-weight: 750; box-shadow: 0 7px 20px #1838400b; }
+    .orders { display: grid; gap: 14px; }
+    .order, .empty, .error { border: 1px solid #e7e8e1; border-radius: 20px; background: var(--paper); box-shadow: 0 16px 42px #1838400c; }
+    .order { padding: 22px; transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease; }
+    .order:hover { transform: translateY(-1px); box-shadow: 0 20px 46px #18384012; }
+    .order.highlight { border-color: #78aaa0; box-shadow: 0 0 0 4px #176c6812, 0 15px 40px #1838400c; }
+    .order-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; padding-bottom: 17px; border-bottom: 1px solid #edf0eb; }
+    .destination { margin: 0 0 7px; color: var(--ink); font-size: 21px; }
+    .meta { color: var(--muted); font-size: 12px; line-height: 1.6; }
+    .badge { display: inline-flex; min-height: 29px; align-items: center; padding: 0 11px; border: 1px solid #d9e9dc; border-radius: 20px; background: #f0f7f0; color: var(--teal); font-size: 11px; font-weight: 750; }
+    .details { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; padding: 18px 0; }
+    .detail-label { display: block; margin-bottom: 6px; color: var(--muted); font-size: 11px; }
+    .detail-value { color: #28434a; font-size: 13px; font-weight: 700; overflow-wrap: anywhere; }
+    .notes { margin: 0 0 15px; padding: 12px 14px; border: 1px solid #ebeee7; border-radius: 12px; background: #f7f8f4; color: #465e61; font-size: 13px; line-height: 1.7; }
+    .request-itinerary { margin: 0 0 17px; padding: 17px; border: 1px solid #e6ece6; border-radius: 15px; background: #f9faf7; }
+    .request-itinerary h3 { margin: 0 0 7px; color: var(--ink); font-size: 15px; }
+    .request-estimate { margin: 0 0 13px; color: var(--teal); font-size: 13px; font-weight: 750; }
+    .request-day { padding: 11px 0; border-top: 1px solid #e8ece6; }
+    .request-day h4 { margin: 0 0 7px; color: #385256; font-size: 12px; }
+    .request-activity, .request-costs { display: flex; flex-wrap: wrap; gap: 7px 16px; margin: 0; color: #52646b; font-size: 11px; line-height: 1.7; }
+    .request-costs { margin-top: 6px; color: #657873; }
+    .request-price-note { margin: 12px 0 0; color: var(--muted); font-size: 10px; line-height: 1.7; }
+    .order-foot { display: flex; align-items: center; justify-content: flex-start; gap: 12px; }
+    .button.print-order { border-color: #dce8df; color: var(--teal); }
+    .button.icon-button { width: 44px; min-width: 44px; height: 44px; padding: 0; }
+    .icon-button svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
+    .button.delete-order { border-color: #f0d8d3; color: #b94e3d; }
+    .button.delete-order:hover { background: #fff3f0; }
+    .empty, .error { padding: 44px 20px; text-align: center; }
+    .empty strong, .error strong { display: block; margin-bottom: 7px; color: var(--ink); font-size: 17px; }
+    .empty p, .error p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.7; }
+    .empty .button { margin-top: 17px; }
+    .office-login { max-width: 440px; margin: 0 auto; padding: 22px; border: 1px solid #e7e8e1; border-radius: 20px; background: var(--paper); box-shadow: 0 16px 42px #1838400c; }
+    .office-login h2 { margin: 0 0 8px; color: var(--ink); font-size: 19px; }
+    .office-login p { margin: 0 0 16px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+    .office-login form { display: grid; gap: 10px; }
+    .office-login input { width: 100%; min-height: 46px; padding: 0 13px; border: 1px solid #dce3de; border-radius: 12px; background: white; font: inherit; }
+    .office-login .error { padding: 0; border: 0; background: transparent; box-shadow: none; color: #b94e3d; font-size: 12px; }
+    @media (max-width: 850px) {
+      .page { width: min(760px, calc(100% - 36px)); padding-top: 20px; }
+      .intro { margin-top: 35px; }
+      .details { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    @media (max-width: 650px) {
+      .page { width: calc(100% - 24px); padding: max(12px, env(safe-area-inset-top)) 0 max(20px, env(safe-area-inset-bottom)); }
+      .brand-icon { width: 42px; height: 42px; border-radius: 14px; }
+      .brand-name { font-size: 17px; }
+      .brand-tagline { font-size: 10px; }
+      .actions { gap: 6px; }
+      .button { min-height: 44px; padding: 0 11px; font-size: 12px; }
+      .intro { align-items: flex-start; flex-direction: column; gap: 13px; margin: 26px 2px 18px; }
+      .eyebrow { padding: 6px 10px; font-size: 11px; }
+      h1 { margin: 11px 0 6px; font-size: clamp(30px, 8vw, 39px); }
+      .intro p { font-size: 13px; }
+      .count { padding: 9px 12px; font-size: 12px; }
+      .order { padding: 16px; border-radius: 17px; }
+      .order-head { gap: 10px; padding-bottom: 13px; }
+      .destination { font-size: 18px; }
+      .meta { font-size: 11px; }
+      .details { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px 10px; padding: 15px 0; }
+      .detail-label { font-size: 10px; }
+      .detail-value { font-size: 12px; }
+      .badge { min-height: 26px; padding: 0 8px; font-size: 10px; }
+      .request-itinerary { padding: 13px; }
+    }
+    @media (max-width: 370px) {
+      .page { width: calc(100% - 18px); }
+      .brand { gap: 8px; }
+      .actions { gap: 5px; }
+      .button { padding: 0 8px; font-size: 11px; }
+    }
+    @media (max-width: 900px) and (max-height: 500px) {
+      .page { padding-top: max(8px, env(safe-area-inset-top)); }
+      .intro { margin-top: 20px; }
+      .order { padding: 16px; }
+      .details { gap: 10px; padding: 12px 0; }
+    }
+    @media print {
+      @page { margin: 16mm; }
+      body { min-width: 0; background: white; }
+      .page { width: 100%; padding: 0; }
+      header, .intro, .order-foot, .order:not(.print-target) { display: none !important; }
+      .orders { display: block; }
+      .order.print-target { display: block !important; padding: 0; border: 0; border-radius: 0; box-shadow: none; transform: none; }
+      .request-itinerary, .request-day { break-inside: avoid; page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyAumhBxI2c5ZQmiByTpz9g_zQ8HvgtuNc8",
+    authDomain: "rihal-a8876.firebaseapp.com",
+    projectId: "rihal-a8876",
+    storageBucket: "rihal-a8876.firebasestorage.app",
+    messagingSenderId: "837997619585",
+    appId: "1:837997619585:web:c0399bebb8a6f4ceaf2080",
+    measurementId: "G-LVQ7GGFF9S"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
+  
+  <main class="page">
+    <header>
+      <a class="brand" href="index.html" aria-label="Rihal home">
+        <img class="brand-icon" src="rihal-icon.svg" alt="">
+        <span><span class="brand-name" id="brand-name">رِحال</span><span class="brand-tagline" id="brand-tagline">رحلتك تبدأ ببساطة</span></span>
+      </a>
+      <div class="actions">
+        <a class="button" href="index.html" id="home-link">صفحة العميل</a>
+        <button class="button" id="language" type="button">English</button>
+        <button class="button" id="sign-out" type="button" hidden>تسجيل الخروج</button>
+      </div>
+    </header>
+    <section class="intro">
+      <div>
+        <div class="eyebrow" id="eyebrow">لوحة مكاتب السفر</div>
+        <h1 id="title">طلبات الرحلات</h1>
+        <p id="subtitle">الطلبات التي أكدها العملاء، جاهزة لمراجعة فريق المكتب.</p>
+      </div>
+      <div class="count" id="count"></div>
+    </section>
+    <section class="office-login" id="office-login">
+      <h2 id="login-title">دخول موظفي المكتب</h2>
+      <p id="login-description">سجّل الدخول بالبريد المعتمد للوصول إلى الطلبات.</p>
+      <form id="login-form">
+        <input id="login-email" type="email" autocomplete="username" required aria-label="البريد الإلكتروني" placeholder="البريد الإلكتروني">
+        <input id="login-password" type="password" autocomplete="current-password" required aria-label="كلمة المرور" placeholder="كلمة المرور">
+        <div class="error" id="login-error" role="alert"></div>
+        <button class="button primary" id="login-submit" type="submit">تسجيل الدخول</button>
+      </form>
+    </section>
+    <section class="orders" id="orders" aria-live="polite" hidden></section>
+  </main>
+  <script type="module" src="firebase-client.js"></script>
+  <script type="module">
+    const translations = {
+      ar: {
+        home: "صفحة العميل", eyebrow: "لوحة مكاتب السفر", title: "طلبات الرحلات",
+        subtitle: "الطلبات التي أكدها العملاء، جاهزة لمراجعة فريق المكتب.",
+        count: (n) => `${n} طلب`, new: "طلب جديد", reviewed: "تمت المراجعة",
+        requestId: "رقم الطلب", received: "وقت الاستلام", tripType: "نوع الرحلة",
+        roundTrip: "ذهاب وعودة", oneWay: "ذهاب فقط", departure: "المغادرة", returning: "العودة",
+        travelers: "المسافرون", adults: (n) => `${n} بالغ`, children: (n) => `${n} طفل`,
+        budget: "الميزانية", flight: "الرحلة الجوية", direct: "مباشر", any: "أي خيار",
+        hotelLabel: "تصنيف الفندق", hotel: (n) => n ? `${n} نجوم` : "بدون تفضيل", notes: "ملاحظات العميل",
+        itinerary: "الجدول السياحي والتكلفة التقديرية", estimatedTotal: "الإجمالي التقديري", day: (n) => `اليوم ${n}`,
+        food: "الطعام", transport: "التنقل", accommodation: "الإقامة للفرد", dayTotal: "إجمالي اليوم للفرد",
+        airfareExcluded: "الأسعار تقريبية ولا تشمل تذاكر الطيران أو التسوق. الأوقات مقترحة؛ يُرجى التحقق من مواعيد العمل والحجز.",
+        markReviewed: "تحديد كمُراجع", emptyTitle: "ما فيه طلبات لحد الآن",
+        print: "طباعة الطلب", printError: "تعذرت طباعة الطلب. حاول مرة أخرى.",
+        delete: "حذف الطلب", confirmDelete: "هل أنت متأكد من حذف هذا الطلب؟ لا يمكن التراجع عن هذا الإجراء.",
+        deleteError: "تعذر حذف الطلب. حاول مرة أخرى.",
+        emptyText: "طلبات العملاء المؤكدة راح تظهر هنا.", storageTitle: "تعذر تحميل الطلبات",
+        storageText: "تعذر الاتصال بخادم الطلبات. حاول تحديث الصفحة.", updateError: "تعذر تحديث حالة الطلب.",
+        loginTitle: "دخول موظفي المكتب", loginDescription: "سجّل الدخول بالبريد المعتمد للوصول إلى الطلبات.",
+        login: "تسجيل الدخول", logout: "تسجيل الخروج", email: "البريد الإلكتروني", password: "كلمة المرور",
+        loginError: "تعذر تسجيل الدخول. تحقق من البريد وكلمة المرور.", verifyEmail: "أرسلنا رسالة تحقق إلى بريدك. أكّد البريد ثم سجّل الدخول.",
+        accessDenied: "هذا الحساب غير مخوّل لعرض لوحة المكتب.", loading: "جارٍ تحميل الطلبات...",
+        dateLocale: "ar"
+      },
+      en: {
+        home: "Customer page", eyebrow: "Travel office dashboard", title: "Trip requests",
+        subtitle: "Customer-confirmed requests, ready for your team to review.",
+        count: (n) => `${n} request${n === 1 ? "" : "s"}`, new: "New request", reviewed: "Reviewed",
+        requestId: "Request ID", received: "Received", tripType: "Trip type",
+        roundTrip: "Round-trip", oneWay: "One-way", departure: "Departure", returning: "Return",
+        travelers: "Travelers", adults: (n) => `${n} adult${n === 1 ? "" : "s"}`, children: (n) => `${n} child${n === 1 ? "" : "ren"}`,
+        budget: "Budget", flight: "Flight preference", direct: "Direct", any: "Any option",
+        hotelLabel: "Hotel rating", hotel: (n) => n ? `${n} stars` : "No preference", notes: "Customer notes",
+        itinerary: "Suggested itinerary & estimated costs", estimatedTotal: "Estimated total", day: (n) => `Day ${n}`,
+        food: "Food", transport: "Local transit", accommodation: "Accommodation / person", dayTotal: "Daily total / person",
+        airfareExcluded: "Prices are estimates and exclude airfare and shopping. Suggested times should be checked against opening hours and booking availability.",
+        markReviewed: "Mark as reviewed", emptyTitle: "No requests yet",
+        print: "Print request", printError: "Couldn't print this request. Please try again.",
+        delete: "Delete request", confirmDelete: "Are you sure you want to delete this request? This action can't be undone.",
+        deleteError: "Couldn't delete this request. Please try again.",
+        emptyText: "Confirmed customer requests will appear here.", storageTitle: "Couldn't load requests",
+        storageText: "Couldn't connect to the requests server. Try refreshing the page.", updateError: "Couldn't update request status.",
+        loginTitle: "Office sign in", loginDescription: "Sign in with the authorized email to view requests.",
+        login: "Sign in", logout: "Sign out", email: "Email address", password: "Password",
+        loginError: "Couldn't sign in. Check your email and password.", verifyEmail: "A verification email was sent. Verify your email, then sign in.",
+        accessDenied: "This account is not authorized to view the office dashboard.", loading: "Loading requests...",
+        dateLocale: "en"
+      }
+    };
+    let language = document.documentElement.lang === "en" ? "en" : "ar";
+    let statusError = "";
+    let officeApi = null;
+    let officeUser = null;
+    const t = (key) => translations[language][key];
+    function element(tag, className, content) {
+      const el = document.createElement(tag);
+      if (className) el.className = className;
+      if (content !== undefined) el.textContent = content;
+      return el;
+    }
+    function iconButton(label, className, path, onClick) {
+      const button = element("button", `button icon-button ${className}`);
+      button.type = "button";
+      button.setAttribute("aria-label", label);
+      button.title = label;
+      const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      icon.setAttribute("viewBox", "0 0 24 24");
+      icon.setAttribute("aria-hidden", "true");
+      const shape = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      shape.setAttribute("d", path);
+      icon.append(shape);
+      button.append(icon);
+      button.addEventListener("click", onClick);
+      return button;
+    }
+    function formatDate(value) {
+      return new Intl.DateTimeFormat(t("dateLocale"), { dateStyle: "long", timeZone: "UTC" }).format(new Date(`${value}T00:00:00Z`));
+    }
+    function formatReceived(value) {
+      const date = value && typeof value.toDate === "function" ? value.toDate() : new Date(value);
+      if (Number.isNaN(date.getTime())) return "—";
+      return new Intl.DateTimeFormat(t("dateLocale"), { dateStyle: "medium", timeStyle: "short" }).format(date);
+    }
+    function detail(container, label, value) {
+      const item = element("div");
+      item.append(element("span", "detail-label", label), element("span", "detail-value", value));
+      container.append(item);
+    }
+    function formatCost(amount, currency) {
+      const code = currency === "OTHER" ? "SAR" : currency || "SAR";
+      const value = Number(amount);
+      if (!Number.isFinite(value)) return "—";
+      return new Intl.NumberFormat(t("dateLocale"), { style: "currency", currency: code, maximumFractionDigits: 0 }).format(value);
+    }
+    function renderItinerary(request) {
+      const itinerary = request.itinerary;
+      if (!itinerary || !Array.isArray(itinerary.days)) return null;
+      const section = element("section", "request-itinerary");
+      section.append(element("h3", "", t("itinerary")));
+      section.append(element("p", "request-estimate", `${t("estimatedTotal")}: ${formatCost(itinerary.estimated_total, itinerary.currency)}`));
+      itinerary.days.forEach((day) => {
+        const row = element("div", "request-day");
+        row.append(element("h4", "", t("day")(day.day)));
+        const activities = element("p", "request-activity");
+        (Array.isArray(day.activities) ? day.activities : []).forEach((activity) => {
+          const name = language === "ar" ? activity.name_ar || activity.name : activity.name_en || activity.name;
+          const time = language === "ar" ? activity.estimated_time_ar : activity.estimated_time_en;
+          activities.append(element("span", "", `${time ? `${time} · ` : ""}${name}: ${formatCost(activity.estimated_entry_cost, itinerary.currency)}`));
+        });
+        row.append(activities);
+        row.append(element("p", "request-costs", `${t("food")}: ${formatCost(day.estimated_meals, itinerary.currency)} · ${t("transport")}: ${formatCost(day.estimated_local_transport, itinerary.currency)} · ${t("accommodation")}: ${formatCost(day.estimated_accommodation_per_person, itinerary.currency)} · ${t("dayTotal")}: ${formatCost(day.estimated_day_total_per_person, itinerary.currency)}`));
+        section.append(row);
+      });
+      section.append(element("p", "request-price-note", t("airfareExcluded")));
+      return section;
+    }
+    function render() {
+      document.documentElement.lang = language;
+      document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
+      document.title = language === "ar" ? "رِحال — طلبات المكاتب" : "Rihal — Office requests";
+      document.getElementById("home-link").textContent = t("home");
+      document.getElementById("brand-name").textContent = language === "ar" ? "رِحال" : "Rihal";
+      document.getElementById("brand-tagline").textContent = language === "ar" ? "رحلتك تبدأ ببساطة" : "Travel, made simple";
+      document.getElementById("eyebrow").textContent = t("eyebrow");
+      document.getElementById("title").textContent = t("title");
+      document.getElementById("subtitle").textContent = t("subtitle");
+      document.getElementById("language").textContent = language === "ar" ? "English" : "العربية";
+      document.getElementById("sign-out").textContent = t("logout");
+      document.getElementById("sign-out").hidden = !officeUser;
+      document.getElementById("office-login").hidden = Boolean(officeUser);
+      document.getElementById("login-title").textContent = t("loginTitle");
+      document.getElementById("login-description").textContent = t("loginDescription");
+      document.getElementById("login-email").placeholder = t("email");
+      document.getElementById("login-email").setAttribute("aria-label", t("email"));
+      document.getElementById("login-password").placeholder = t("password");
+      document.getElementById("login-password").setAttribute("aria-label", t("password"));
+      document.getElementById("login-submit").textContent = t("login");
+      const list = document.getElementById("orders");
+      list.hidden = !officeUser;
+      list.innerHTML = "";
+      if (officeUser && officeApi) loadRequests();
+      else document.getElementById("count").textContent = "";
+    }
+    async function loadRequests() {
+      const list = document.getElementById("orders");
+      list.innerHTML = "";
+      list.append(element("div", "empty", t("loading")));
+      try {
+        const result = await officeApi.listRequests();
+        const requests = result.requests;
+        if (!Array.isArray(requests)) throw new Error("Server returned an invalid request list.");
+        list.innerHTML = "";
+        document.getElementById("count").textContent = t("count")(requests.length);
+        if (statusError) {
+          const errorMessage = element("div", "error");
+          errorMessage.append(element("strong", "", statusError));
+          list.append(errorMessage);
+          statusError = "";
+        }
+        if (!requests.length) {
+          const empty = element("div", "empty");
+          empty.append(element("strong", "", t("emptyTitle")), element("p", "", t("emptyText")));
+          list.append(empty);
+          return;
+        }
+        const focusId = new URLSearchParams(location.search).get("request");
+        requests.forEach((request) => list.append(renderOrder(request, request.request_id === focusId)));
+      } catch (error) {
+        console.error("Could not load travel requests from Firebase.", error);
+        document.getElementById("count").textContent = "";
+        list.innerHTML = "";
+        const message = element("div", "error");
+        message.append(element("strong", "", t("storageTitle")), element("p", "", error.code === "functions/permission-denied" ? t("accessDenied") : t("storageText")));
+        list.append(message);
+      }
+    }
+    function renderOrder(request, highlighted) {
+      const card = element("article", `order${highlighted ? " highlight" : ""}`);
+      card.dataset.requestId = request.request_id || "";
+      const heading = element("div", "order-head");
+      const titleArea = element("div");
+      titleArea.append(element("h2", "destination", request.destination || "—"));
+      titleArea.append(element("div", "meta", `${t("requestId")}: ${request.request_id || "—"} · ${t("received")}: ${formatReceived(request.created_at)}`));
+      const badge = element("span", "badge", request.office_status === "reviewed" ? t("reviewed") : t("new"));
+      heading.append(titleArea, badge);
+      const details = element("div", "details");
+      detail(details, t("tripType"), request.trip_type === "round_trip" ? t("roundTrip") : t("oneWay"));
+      detail(details, t("departure"), formatDate(request.departure_date));
+      if (request.trip_type === "round_trip" && request.return_date) detail(details, t("returning"), formatDate(request.return_date));
+      detail(details, t("travelers"), `${t("adults")(request.travelers.adults)}${request.travelers.children ? `, ${t("children")(request.travelers.children)}` : ""}`);
+      detail(details, t("budget"), `${request.budget.amount} ${request.budget.currency}`);
+      detail(details, t("flight"), request.preferences.flight_preference === "direct" ? t("direct") : t("any"));
+      detail(details, t("hotelLabel"), t("hotel")(request.preferences.hotel_stars));
+      card.append(heading, details);
+      const itinerary = renderItinerary(request);
+      if (itinerary) card.append(itinerary);
+      if (request.preferences.special_notes) {
+        card.append(element("p", "notes", `${t("notes")}: ${request.preferences.special_notes}`));
+      }
+      const footer = element("div", "order-foot");
+      if (request.office_status !== "reviewed") {
+        const mark = element("button", "button", t("markReviewed"));
+        mark.type = "button";
+        mark.addEventListener("click", () => markReviewed(request.firestoreId));
+        footer.append(mark);
+      }
+      footer.append(
+        iconButton(t("print"), "print-order", "M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v7H6z", () => printRequest(request.request_id)),
+        iconButton(t("delete"), "delete-order", "M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m4 4v6m6-6v6", () => deleteRequest(request.firestoreId))
+      );
+      card.append(footer);
+      return card;
+    }
+    function printRequest(requestId) {
+      const card = Array.from(document.querySelectorAll(".order")).find((item) => item.dataset.requestId === requestId);
+      if (!card) {
+        console.error(`Could not find travel request ${requestId} to print.`);
+        statusError = t("printError");
+        render();
+        return;
+      }
+      const cleanup = () => {
+        card.classList.remove("print-target");
+        document.body.classList.remove("printing-order");
+      };
+      card.classList.add("print-target");
+      document.body.classList.add("printing-order");
+      window.addEventListener("afterprint", cleanup, { once: true });
+      try {
+        window.print();
+      } catch (error) {
+        window.removeEventListener("afterprint", cleanup);
+        cleanup();
+        console.error(`Could not print travel request ${requestId}.`, error);
+        statusError = t("printError");
+        render();
+      }
+    }
+    async function markReviewed(firestoreId) {
+      try {
+        await officeApi.markReviewed(firestoreId);
+        await loadRequests();
+      } catch (error) {
+        console.error(`Could not update travel request ${firestoreId}.`, error);
+        statusError = t("updateError");
+        await loadRequests();
+      }
+    }
+    async function deleteRequest(firestoreId) {
+      if (!window.confirm(t("confirmDelete"))) return;
+      try {
+        await officeApi.deleteRequest(firestoreId);
+        await loadRequests();
+      } catch (error) {
+        console.error(`Could not delete travel request ${firestoreId}.`, error);
+        statusError = t("deleteError");
+        await loadRequests();
+      }
+    }
+    document.getElementById("login-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const error = document.getElementById("login-error");
+      error.textContent = "";
+      const submit = document.getElementById("login-submit");
+      submit.disabled = true;
+      try {
+        const credential = await officeApi.signIn(
+          document.getElementById("login-email").value.trim(),
+          document.getElementById("login-password").value
+        );
+        if (!credential.user.emailVerified) {
+          await officeApi.sendVerificationEmail(credential.user);
+          await officeApi.signOut();
+          error.textContent = t("verifyEmail");
+        }
+      } catch (signInError) {
+        console.error("Could not sign into the office dashboard.", signInError);
+        error.textContent = t("loginError");
+      } finally {
+        submit.disabled = false;
+      }
+    });
+    document.getElementById("sign-out").addEventListener("click", async () => {
+      try {
+        await officeApi.signOut();
+      } catch (error) {
+        console.error("Could not sign out from the office dashboard.", error);
+        statusError = t("loginError");
+      }
+    });
+    document.getElementById("language").addEventListener("click", () => {
+      language = language === "ar" ? "en" : "ar";
+      render();
+    });
+    render();
+    window.rihalFirebaseReady.then((api) => {
+      officeApi = api;
+      api.onAuthStateChanged((user) => {
+        officeUser = user;
+        if (user && !user.emailVerified) {
+          document.getElementById("login-error").textContent = t("verifyEmail");
+          api.signOut().catch((error) => console.error("Could not sign out unverified office account.", error));
+          return;
+        }
+        document.getElementById("login-error").textContent = "";
+        render();
+      });
+    }).catch((error) => {
+      console.error("Could not initialize Firebase for the office dashboard.", error);
+      document.getElementById("login-error").textContent = t("storageText");
+    });
+  </script>
+</body>
+</html>

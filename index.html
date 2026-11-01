@@ -1,0 +1,1122 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f7f5ef">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Rihal">
+  <link rel="manifest" href="app.webmanifest">
+  <link rel="icon" type="image/svg+xml" href="rihal-icon.svg">
+  <link rel="apple-touch-icon" sizes="180x180" href="rihal-icon-180.png">
+  <title>رِحال — خطّط لرحلتك</title>
+  <style>
+    :root {
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      color: #19333a;
+      background: #f7f5ef;
+      --ink: #19333a;
+      --muted: #72838a;
+      --line: #e6e8e2;
+      --paper: #fffefa;
+      --teal: #176c68;
+      --teal-dark: #105551;
+      --coral: #e88164;
+      --mint: #e8f2ed;
+      --shadow: 0 24px 70px #18384012;
+    }
+    * { box-sizing: border-box; }
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      background:
+        radial-gradient(ellipse at 8% 0%, #e6efeb 0, transparent 28rem),
+        radial-gradient(ellipse at 96% 28%, #fae8dc 0, transparent 23rem),
+        #f7f5ef;
+    }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 3px solid #176c6838;
+      outline-offset: 2px;
+    }
+    .page { width: min(1160px, calc(100% - 56px)); margin: auto; padding: 24px 0 48px; }
+    header { display: flex; align-items: center; justify-content: space-between; }
+    .brand { display: inline-flex; align-items: center; gap: 11px; color: var(--ink); text-decoration: none; }
+    .brand-icon { display: block; width: 48px; height: 48px; border-radius: 16px; box-shadow: 0 6px 16px #173c421f; }
+    .brand-name { display: block; font-size: 19px; font-weight: 800; letter-spacing: -.5px; }
+    .brand-tagline { display: block; margin-top: 2px; color: var(--muted); font-size: 11px; font-weight: 500; }
+    .header-actions { display: flex; align-items: center; gap: 9px; }
+    .quiet-button { min-height: 42px; padding: 0 15px; border: 1px solid #e1e5df; border-radius: 13px; background: #fffefa; color: #52646b; font-size: 13px; font-weight: 650; transition: background .16s ease, transform .16s ease; }
+    .quiet-button:hover { transform: translateY(-1px); background: white; }
+    .intro { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 32px; margin: 42px auto 27px; }
+    .intro-copy { max-width: 650px; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 7px 11px; border: 1px solid #dce8df; border-radius: 30px; background: #f2f7f2; color: var(--teal); font-size: 12px; font-weight: 750; }
+    .eyebrow::before { width: 7px; height: 7px; border-radius: 50%; background: #72a58c; content: ""; }
+    h1 { margin: 14px 0 10px; color: var(--ink); font-size: clamp(36px, 5vw, 56px); letter-spacing: -1.8px; line-height: 1.12; }
+    .intro p { max-width: 540px; margin: 0; color: var(--muted); font-size: 15px; line-height: 1.8; }
+    .hero-note { display: flex; min-width: 208px; align-items: center; gap: 12px; padding: 15px 17px; border: 1px solid #e8e5db; border-radius: 17px; background: #fffefaad; }
+    .hero-note-icon { display: grid; width: 40px; height: 40px; flex: 0 0 40px; place-items: center; border-radius: 13px; background: #fff0e8; color: #c8674f; font-size: 19px; }
+    .hero-note strong { display: block; color: var(--ink); font-size: 13px; }
+    .hero-note span:last-child { display: block; margin-top: 4px; color: var(--muted); font-size: 11px; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr) 292px; gap: 20px; max-width: 1080px; margin: auto; align-items: start; }
+    .chat, .side { overflow: hidden; border: 1px solid #e7e8e1; border-radius: 23px; background: var(--paper); box-shadow: var(--shadow); }
+    .chat-head { display: flex; align-items: center; justify-content: space-between; padding: 17px 21px; border-bottom: 1px solid #eff0ec; }
+    .assistant { display: flex; align-items: center; gap: 11px; }
+    .avatar { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 15px; background: #edf4ef; }
+    .avatar img { width: 31px; height: 31px; }
+    .assistant strong { display: block; color: var(--ink); font-size: 14px; }
+    .status { margin-top: 4px; color: var(--muted); font-size: 11px; }
+    .status::before { display: inline-block; width: 6px; height: 6px; margin-inline-end: 6px; border-radius: 50%; background: #69a77f; content: ""; }
+    .count { padding: 7px 10px; border-radius: 10px; background: #f4f6f2; color: #526c68; direction: ltr; unicode-bidi: isolate; font-size: 12px; font-weight: 700; }
+    .track { height: 3px; background: #f1f1ec; }
+    .fill { width: 8%; height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--teal), #73a992); transition: width .25s ease; }
+    .messages { display: flex; min-height: 300px; max-height: 480px; flex-direction: column; gap: 14px; overflow-y: auto; padding: 22px 22px 17px; scroll-behavior: smooth; overscroll-behavior: contain; }
+    .bubble { max-width: min(88%, 550px); padding: 12px 15px; border-radius: 17px; font-size: 14px; line-height: 1.75; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .bot { align-self: flex-start; border: 1px solid #ebeee8; border-start-start-radius: 6px; background: #f7f8f4; color: #2d4549; }
+    .user { align-self: flex-end; border-start-end-radius: 6px; background: var(--teal); color: white; box-shadow: 0 5px 13px #176c6824; }
+    .response { padding: 0 22px 21px; animation: show .2s ease-out; }
+    @keyframes show { from { transform: translateY(5px); opacity: 0; } to { transform: none; opacity: 1; } }
+    form { display: grid; gap: 10px; }
+    .row { display: flex; gap: 9px; }
+    .row > * { min-width: 0; flex: 1; }
+    .input, select, textarea { width: 100%; min-height: 49px; padding: 0 14px; border: 1px solid #dce3de; border-radius: 13px; background: #fff; color: var(--ink); font-size: 14px; transition: border-color .16s ease, box-shadow .16s ease; }
+    .input:focus, select:focus, textarea:focus { border-color: #75a69a; box-shadow: 0 0 0 3px #176c6814; outline: none; }
+    input[type="date"] { direction: ltr; text-align: start; }
+    textarea { min-height: 92px; padding: 12px 14px; resize: vertical; }
+    input::placeholder, textarea::placeholder { color: #9aa8a6; }
+    .primary, .choice { min-height: 47px; padding: 0 17px; border: 0; border-radius: 13px; font-size: 13px; font-weight: 750; transition: transform .16s ease, box-shadow .16s ease, background .16s ease; }
+    .primary { background: var(--teal); color: white; box-shadow: 0 7px 16px #176c6826; }
+    .primary:hover { transform: translateY(-1px); background: var(--teal-dark); box-shadow: 0 9px 19px #176c6833; }
+    .choice { border: 1px solid #e0e6e1; background: white; color: #315057; }
+    .choice:hover { transform: translateY(-1px); border-color: #95b8aa; background: #f3f8f4; }
+    .choices { display: flex; flex-wrap: wrap; gap: 9px; }
+    .error { min-height: 15px; color: #b94e3d; font-size: 12px; }
+    .side { padding: 22px; }
+    .side h2 { margin: 0; color: var(--ink); font-size: 16px; letter-spacing: -.2px; }
+    .side p { margin: 8px 0 17px; color: var(--muted); font-size: 12px; line-height: 1.75; }
+    .steps { display: grid; gap: 4px; }
+    .step { display: flex; min-height: 39px; align-items: center; gap: 11px; color: #99a5a2; font-size: 12px; transition: color .18s ease; }
+    .step-number { display: grid; width: 26px; height: 26px; flex: 0 0 26px; place-items: center; border: 1px solid #e4e9e4; border-radius: 50%; background: white; color: #84938e; font-size: 11px; }
+    .step.active { color: var(--teal); font-weight: 750; }
+    .step.active .step-number { border-color: var(--teal); background: var(--teal); color: white; box-shadow: 0 3px 9px #176c682b; }
+    .step.done { color: #5f7971; }
+    .step.done .step-number { border-color: #d9e8dd; background: #edf5ef; color: var(--teal); }
+    .privacy { display: flex; gap: 9px; margin-top: 18px; padding-top: 15px; border-top: 1px solid #edf0eb; color: var(--muted); font-size: 11px; line-height: 1.75; }
+    .privacy-mark { color: var(--teal); font-size: 15px; }
+    .success-card { max-width: 470px; margin-top: 8px; padding: 20px; border: 1px solid #d9e9dc; border-radius: 17px; background: #f3f8f2; }
+    .success-card strong { display: block; margin-bottom: 6px; color: var(--teal); font-size: 16px; }
+    .success-card p { margin: 0 0 14px; color: #637670; font-size: 13px; line-height: 1.7; }
+    @media (max-width: 850px) {
+      .page { width: min(760px, calc(100% - 36px)); padding-top: 20px; }
+      .intro { margin-top: 35px; }
+      .layout { grid-template-columns: minmax(0, 1fr) 245px; gap: 14px; }
+      .side { padding: 18px; }
+    }
+    @media (max-width: 680px) {
+      body { background: radial-gradient(ellipse at 20% 0%, #eaf0e9 0, transparent 23rem), #f7f5ef; }
+      .page { width: min(100% - 24px, 560px); padding: 12px 0 max(20px, env(safe-area-inset-bottom)); }
+      header { min-height: 47px; }
+      .brand-icon { width: 42px; height: 42px; border-radius: 14px; }
+      .brand-name { font-size: 17px; }
+      .brand-tagline { font-size: 10px; }
+      .header-actions { gap: 6px; }
+      .quiet-button { min-height: 39px; padding: 0 11px; font-size: 12px; }
+      .intro { grid-template-columns: 1fr; gap: 14px; margin: 24px 2px 17px; }
+      .intro-copy { max-width: none; }
+      .eyebrow { padding: 6px 10px; font-size: 11px; }
+      h1 { margin: 11px 0 7px; font-size: clamp(33px, 9vw, 43px); letter-spacing: -1.2px; }
+      .intro p { font-size: 13px; line-height: 1.7; }
+      .hero-note { width: fit-content; min-width: 0; padding: 9px 12px; border-radius: 13px; }
+      .hero-note-icon { width: 34px; height: 34px; flex-basis: 34px; border-radius: 11px; font-size: 16px; }
+      .hero-note strong { font-size: 12px; }
+      .hero-note span:last-child { font-size: 10px; }
+      .layout { grid-template-columns: 1fr; gap: 10px; }
+      .side { order: 0; padding: 10px 12px; border-radius: 15px; box-shadow: none; }
+      .side h2, .side p, .privacy { display: none; }
+      .steps { display: flex; gap: 8px; overflow-x: auto; padding: 1px 0 3px; scrollbar-width: none; }
+      .steps::-webkit-scrollbar { display: none; }
+      .step { min-width: max-content; min-height: 29px; gap: 6px; font-size: 10px; }
+      .step-number { width: 22px; height: 22px; flex-basis: 22px; font-size: 10px; }
+      .chat { border-radius: 19px; box-shadow: 0 12px 32px #18384012; }
+      .chat-head { padding: 12px 14px; }
+      .avatar { width: 36px; height: 36px; border-radius: 13px; }
+      .avatar img { width: 27px; height: 27px; }
+      .assistant strong { font-size: 13px; }
+      .status { font-size: 10px; }
+      .count { padding: 6px 9px; font-size: 11px; }
+      .messages { min-height: clamp(225px, 37vh, 330px); max-height: 43vh; padding: 17px 14px 13px; gap: 11px; }
+      .bubble { max-width: 92%; padding: 10px 12px; border-radius: 15px; font-size: 13px; }
+      .response { padding: 0 14px 15px; }
+      form { gap: 9px; }
+      .input, select, textarea { min-height: 48px; font-size: 16px; }
+      textarea { min-height: 82px; }
+      .primary, .choice { min-height: 45px; padding: 0 13px; font-size: 12px; }
+      .choices { gap: 7px; }
+      .success-card { padding: 16px; }
+    }
+    @media (max-width: 370px) {
+      .page { width: calc(100% - 18px); }
+      .brand { gap: 8px; }
+      .header-actions { gap: 5px; }
+      .quiet-button { padding: 0 8px; font-size: 11px; }
+      .step { font-size: 9px; }
+      .messages { padding-inline: 11px; }
+      .response { padding-inline: 11px; }
+      .row { flex-direction: column; }
+    }
+    @media (min-width: 681px) {
+      .layout { align-items: stretch; }
+      .chat { min-height: 525px; }
+      .messages { min-height: 335px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+    html[dir="ltr"] .bot { border-start-start-radius: 17px; border-start-end-radius: 6px; }
+    html[dir="ltr"] .user { border-start-end-radius: 17px; border-start-start-radius: 6px; }
+    [hidden] { display: none !important; }
+    body { background: #fff; }
+    .page { display: flex; width: min(100% - 48px, 900px); min-height: 100vh; min-height: 100dvh; flex-direction: column; padding: 18px 0 max(24px, env(safe-area-inset-bottom)); }
+    header { min-height: 48px; }
+    .brand { visibility: hidden; }
+    .intro, .chat-head, .track, .side { display: none; }
+    .layout { display: block; width: 100%; max-width: none; flex: 1; margin: 0; }
+    .chat { display: flex; min-height: 0; height: 100%; flex-direction: column; overflow: visible; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+    .messages { display: flex; min-height: min(62vh, 620px); max-height: none; flex: 1; align-items: center; justify-content: center; overflow: visible; padding: 24px 0; }
+    .question-text { max-width: 760px; margin: 0; color: #14191a; font-size: clamp(28px, 4vw, 44px); font-weight: 500; letter-spacing: -.8px; line-height: 1.4; text-align: center; }
+    .typing-text::after { display: inline-block; height: .9em; margin-inline-start: 4px; border-inline-start: 2px solid currentColor; animation: caret-blink .8s steps(2, start) infinite; content: ""; vertical-align: -.08em; }
+    @keyframes caret-blink { to { visibility: hidden; } }
+    .question-hint { max-width: 580px; margin: 13px auto 0; color: #788487; font-size: 15px; letter-spacing: normal; line-height: 1.8; text-align: center; word-spacing: .16em; }
+    .question-hint.reveal { animation: show .35s ease-out both; }
+    .response { width: min(100%, 520px); margin: 0 auto; padding: 0 0 22px; }
+    .response form { justify-items: stretch; }
+    .response .primary { min-height: 52px; border-radius: 15px; font-size: 15px; }
+    .response .choice { min-height: 50px; padding: 0 20px; border-radius: 15px; font-size: 14px; }
+    .response .choices { justify-content: center; }
+    .response .row { align-items: stretch; }
+    .count { position: absolute; top: 27px; inset-inline-start: 50%; transform: translateX(50%); border: 0; background: transparent; color: #a0a9aa; font-size: 12px; font-weight: 500; }
+    html[dir="ltr"] .count { transform: translateX(-50%); }
+    .error { text-align: center; }
+    .itinerary { width: min(100%, 760px); margin: 26px auto 10px; padding: 22px; border: 1px solid #e8ece8; border-radius: 22px; background: #fff; box-shadow: 0 18px 50px #19333a0b; }
+    .itinerary-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding-bottom: 17px; border-bottom: 1px solid #edf0ed; }
+    .itinerary-title { margin: 0; color: var(--ink); font-size: 19px; }
+    .itinerary-subtitle { margin: 5px 0 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+    .smart-badge { flex: 0 0 auto; padding: 8px 11px; border-radius: 20px; background: #eef6f1; color: var(--teal); font-size: 11px; font-weight: 750; }
+    .day-plan { padding: 16px 0; border-bottom: 1px solid #edf0ed; }
+    .day-plan:last-of-type { border-bottom: 0; }
+    .day-title { margin: 0 0 10px; color: var(--ink); font-size: 14px; }
+    .plan-activity { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 14px; padding: 8px 0; color: #40565a; font-size: 13px; }
+    .plan-activity a { color: inherit; text-decoration-color: #b6c8c0; text-underline-offset: 3px; }
+    .activity-place { display: grid; gap: 4px; }
+    .activity-time { color: #81908d; font-size: 10px; }
+    .activity-price { color: #526b65; font-size: 12px; white-space: nowrap; }
+    .day-costs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; padding-top: 12px; }
+    .cost-item { padding: 10px; border-radius: 12px; background: #f7f8f6; }
+    .cost-item span { display: block; color: var(--muted); font-size: 10px; }
+    .cost-item strong { display: block; margin-top: 5px; color: #315057; font-size: 12px; }
+    .trip-estimate { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; padding: 15px; border-radius: 15px; background: #f1f7f2; color: #31534c; }
+    .trip-estimate span { font-size: 12px; line-height: 1.7; }
+    .trip-estimate strong { flex: 0 0 auto; font-size: 18px; }
+    .price-note { margin: 12px 0 0; color: #778486; font-size: 11px; line-height: 1.8; }
+    .summary-box { width: min(100%, 760px); margin: 0 auto 10px; padding: 15px 18px; border: 1px solid #edf0ed; border-radius: 16px; color: #52646b; font-size: 13px; line-height: 1.9; white-space: pre-wrap; text-align: start; }
+    .messages:not(.has-results) .question-text, .messages:not(.has-results) .question-hint { transform: translateY(6vh); }
+    @media (max-width: 680px) {
+      body { background: #fff; }
+      .page { width: min(calc(100% - 32px), 900px); min-height: 100svh; min-height: 100dvh; padding: max(10px, env(safe-area-inset-top)) 0 max(18px, env(safe-area-inset-bottom)); }
+      header { min-height: 40px; }
+      .brand { display: none; }
+      .header-actions { width: 100%; justify-content: flex-end; }
+      .quiet-button { min-height: 38px; border-color: #f0f1ef; background: transparent; }
+      .layout { flex: 1; }
+      .messages { min-height: 48svh; min-height: 48dvh; padding: 18px 0; }
+      .question-text { font-size: clamp(26px, 7vw, 38px); letter-spacing: -.5px; }
+      .question-hint { margin-top: 10px; font-size: 13px; }
+      .response { padding-bottom: 16px; }
+      .itinerary { margin-top: 16px; padding: 16px; border-radius: 18px; }
+      .itinerary-head { gap: 9px; }
+      .itinerary-title { font-size: 17px; }
+      .smart-badge { padding: 7px 9px; font-size: 10px; }
+      .day-costs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .trip-estimate { align-items: flex-start; flex-direction: column; }
+      .trip-estimate strong { font-size: 17px; }
+      .summary-box { padding: 13px 15px; }
+    }
+    @media (max-width: 900px) and (max-height: 500px) {
+      .page { padding-top: max(6px, env(safe-area-inset-top)); }
+      .messages { min-height: 34svh; min-height: 34dvh; padding-block: 10px; }
+      .response { padding-bottom: max(10px, env(safe-area-inset-bottom)); }
+    }
+    .page { width: min(calc(100% - 48px), 900px); min-height: 100dvh; }
+    .layout { display: flex; flex: 1; flex-direction: column; width: min(100%, 720px); min-width: 0; margin: 0 auto; }
+    .chat { display: flex; width: 100%; min-width: 0; min-height: 0; flex: 1; flex-direction: column; overflow: visible; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+    .messages { display: block; width: 100%; min-width: 0; min-height: 0; max-height: none; overflow: visible; padding: 18px 0 0; }
+    .messages:not(.has-results) { display: flex; flex: 1; align-items: center; justify-content: center; padding-block: 0; }
+    .messages:not(.has-results) .question-text,
+    .messages:not(.has-results) .question-hint { transform: none; }
+    .question-card { width: 100%; min-width: 0; margin: 0 auto; padding: 28px; border: 1px solid #e8ece8; border-radius: 22px; background: #fffefa; box-shadow: 0 18px 50px #19333a0b; }
+    .question-progress { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; color: var(--teal); font-size: 12px; font-weight: 750; }
+    .question-progress-count { color: #81908d; font-weight: 600; direction: ltr; unicode-bidi: isolate; }
+    .question-progress-track { height: 4px; margin: -10px 0 20px; overflow: hidden; border-radius: 4px; background: #edf1ed; }
+    .question-progress-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--teal), #73a992); transition: width .25s ease; }
+    .question-text { max-width: 100%; margin: 0 0 18px; font-size: clamp(24px, 3vw, 34px); font-weight: 700; line-height: 1.35; text-align: start; }
+    .question-hint { max-width: 100%; margin: 8px 0 20px; font-size: 14px; text-align: start; }
+    .response { width: 100%; max-width: none; margin: 0; padding: 0; }
+    .response form { justify-items: stretch; }
+    .response .primary, .response .choice { min-height: 50px; }
+    .choices { justify-content: flex-start; }
+    .question-actions { display: flex; gap: 9px; }
+    .question-actions > * { flex: 1; }
+    .question-actions > button { min-width: 0; }
+    .back-button { min-height: 48px; padding: 0 16px; border: 1px solid #dfe7e1; border-radius: 13px; background: #fff; color: #52646b; font-size: 13px; font-weight: 700; }
+    .back-button:hover { border-color: #95b8aa; background: #f3f8f4; }
+    .choice { min-width: 180px; }
+    .summary-box { width: 100%; margin: 0 auto 12px; background: #fffefa; }
+    .itinerary { margin: 12px auto; }
+    .cost-section { margin: 16px 0 4px; padding: 15px; border: 1px solid #e8ece8; border-radius: 15px; background: #f9faf7; }
+    .cost-section h3 { margin: 0 0 10px; color: var(--ink); font-size: 14px; }
+    .cost-section .trip-estimate { margin-top: 0; }
+    .cost-section .price-note { margin-top: 8px; }
+    .day-plan { padding: 0; border-bottom: 1px solid #edf0ed; }
+    .day-title { display: flex; min-height: 48px; align-items: center; margin: 0; cursor: pointer; list-style: none; }
+    .day-title::-webkit-details-marker { display: none; }
+    .day-title::after { margin-inline-start: auto; color: var(--teal); content: "+"; font-size: 20px; }
+    .day-plan[open] > .day-title::after { content: "−"; }
+    .day-content { padding: 0 0 15px; }
+    @media (max-width: 680px) {
+      .page { width: calc(100% - 32px); padding: max(10px, env(safe-area-inset-top)) 0 max(18px, env(safe-area-inset-bottom)); }
+      .layout { width: 100%; }
+      .messages { padding-top: 12px; }
+      .question-card { padding: 20px 16px; border-radius: 18px; }
+      .question-progress { margin-bottom: 16px; }
+      .question-text { margin-bottom: 16px; font-size: clamp(23px, 7vw, 32px); }
+      .question-hint { margin: 8px 0 17px; }
+      .response .choices { display: grid; grid-template-columns: 1fr; gap: 10px; }
+      .response .choice { width: 100%; min-width: 0; min-height: 54px; }
+      .response .primary { width: 100%; min-height: 52px; }
+      .question-actions { position: sticky; bottom: max(8px, env(safe-area-inset-bottom)); z-index: 1; margin: 8px -4px 0; padding: 8px 4px; background: #fffefaed; }
+      .back-button { min-height: 50px; }
+      .notes-actions { flex-direction: column; }
+      .itinerary { margin-top: 12px; padding: 15px; }
+      .day-plan { padding: 0; }
+      .day-content { padding-bottom: 12px; }
+      .day-costs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .summary-box { padding: 13px 15px; }
+    }
+  </style>
+</head>
+<body>
+
+  <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyAumhBxI2c5ZQmiByTpz9g_zQ8HvgtuNc8",
+    authDomain: "rihal-a8876.firebaseapp.com",
+    projectId: "rihal-a8876",
+    storageBucket: "rihal-a8876.firebasestorage.app",
+    messagingSenderId: "837997619585",
+    appId: "1:837997619585:web:c0399bebb8a6f4ceaf2080",
+    measurementId: "G-LVQ7GGFF9S"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
+  <main class="page">
+    <header>
+      <a class="brand" href="index.html" aria-label="Rihal home">
+        <img class="brand-icon" src="rihal-icon.svg" alt="">
+        <span><span class="brand-name" data-copy="brand">رِحال</span><span class="brand-tagline" data-copy="brandTagline">رحلتك تبدأ ببساطة</span></span>
+      </a>
+      <div class="header-actions">
+        <button class="quiet-button" id="restart" type="button" data-copy="restart">ابدأ من جديد</button>
+        <button class="quiet-button" id="language" type="button">English</button>
+      </div>
+    </header>
+    <section class="intro">
+      <div class="intro-copy">
+        <div class="eyebrow" data-copy="eyebrow">مساعدك الشخصي للسفر</div>
+        <h1 data-copy="headline">رحلة أحلى، تبدأ بخطوة.</h1>
+        <p data-copy="subtitle">جاوب على كم سؤال بسيط، وخلي علينا ترتيب طلب رحلتك. واضحة وسهلة من أولها لآخرها.</p>
+      </div>
+      <div class="hero-note">
+        <span class="hero-note-icon" aria-hidden="true">✦</span>
+        <span><strong data-copy="heroNoteTitle">ما تاخذ إلا دقائق</strong><span data-copy="heroNoteText">خطوة واحدة في كل مرة</span></span>
+      </div>
+    </section>
+    <section class="layout">
+      <section class="chat" aria-label="Travel planning chat">
+        <div class="chat-head">
+          <div class="assistant"><span class="avatar" aria-hidden="true"><img src="rihal-icon.svg" alt=""></span><span><strong data-copy="assistant">مساعد رِحال</strong><span class="status" data-copy="status">متاح لمساعدتك</span></span></div>
+          <span class="count" id="count"></span>
+        </div>
+        <div class="track"><div class="fill" id="fill"></div></div>
+        <div class="messages" id="messages" aria-live="polite"></div>
+        <div class="response" id="response"></div>
+      </section>
+      <aside class="side">
+        <h2 data-copy="sideTitle">خطوات بسيطة، ورحلة أوضح</h2>
+        <p data-copy="sideDescription">نجمع التفاصيل الأساسية خطوة بخطوة. تقدر تبدأ من جديد أو تغيّر اللغة بأي وقت.</p>
+        <div class="steps" id="steps"></div>
+        <div class="privacy"><span class="privacy-mark" aria-hidden="true">✦</span><span data-copy="privacy">تظهر لك تفاصيل الرحلة للمراجعة قبل التأكيد.</span></div>
+      </aside>
+    </section>
+  </main>
+  <script type="module" src="firebase-client.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script type="module">
+    import { emailjsConfig } from "./emailjs-config.js";
+
+    const words = {
+      ar: {
+        brand: "رِحال", brandTagline: "رحلتك تبدأ ببساطة", restart: "ابدأ من جديد", eyebrow: "مساعدك الشخصي للسفر",
+        headline: "رحلة أحلى، تبدأ بخطوة.", subtitle: "جاوب على كم سؤال بسيط، وخلي علينا ترتيب طلب رحلتك. واضحة وسهلة من أولها لآخرها.",
+        heroNoteTitle: "ما تاخذ إلا دقائق", heroNoteText: "خطوة واحدة في كل مرة", assistant: "مساعد رِحال", status: "متاح لمساعدتك",
+        sideTitle: "خطوات بسيطة، ورحلة أوضح", sideDescription: "نجمع التفاصيل الأساسية خطوة بخطوة. تقدر تبدأ من جديد أو تغيّر اللغة بأي وقت.",
+        privacy: "تظهر لك تفاصيل الرحلة للمراجعة قبل التأكيد.",
+        stepNames: ["الوجهة", "نوع الرحلة", "المسافرون", "الميزانية", "التفضيلات", "التأكيد"],
+        hello: "أهلًا! أنا رِحال، وبساعدك تخطّط لرحلتك خطوة بخطوة.",
+        destination: "وين تبي تسافر؟",
+        destinationPlaceholder: "مثال: العلا، جدة، دبي، القاهرة، إسطنبول، باريس، طوكيو",
+        tripType: "رحلتك ذهاب وعودة أو ذهاب فقط؟", roundTrip: "ذهاب وعودة", oneWay: "ذهاب فقط",
+        departureDate: "متى تاريخ المغادرة؟", returnDate: "ومتى تاريخ العودة؟", adults: "كم عدد المسافرين البالغين؟",
+        children: "وكم عدد الأطفال؟", budget: "كم ميزانيتك التقريبية للرحلة؟", budgetHint: "المبلغ",
+        currency: "العملة", currencyHint: "اختر العملة", flight: "أي خيار تفضّل للرحلة الجوية؟",
+        direct: "رحلات مباشرة", anyFlight: "أي خيار مناسب", hotel: "كم نجمة تفضّل للفندق؟",
+        anyStars: "بدون تفضيل", stars: (n) => `${n} نجوم`, notes: "هل عندك نشاط أو طلب خاص تحب نعرفه؟",
+        notesHint: "مثال: أماكن مناسبة للأطفال، أو فندق قريب من وسط المدينة", skip: "تخطي",
+        destinationLabel: "الوجهة", tripLabel: "نوع الرحلة", departLabel: "المغادرة", returnLabel: "العودة",
+        travelersLabel: "المسافرون", budgetLabel: "الميزانية", preferencesLabel: "التفضيلات",
+        adultsCount: (n) => `${n} بالغ`, childrenCount: (n) => `${n} طفل`,
+        confirm: "نعم، أكّد الرحلة", startOver: "ابدأ من جديد",
+        successTitle: "تم تأكيد طلبك بنجاح!",
+        success: "حُفظ طلبك في النظام وسنرسل تفاصيله إلى بريد المكتب.",
+        emailWarning: "تم حفظ الطلب، لكن تعذّر إرسال إشعار البريد. سيتوفر الطلب في لوحة المكتب.",
+        retryEmail: "إعادة إرسال إشعار البريد",
+        storageError: "تعذر إرسال الطلب إلى الخادم. تحقق من الاتصال وحاول مرة أخرى.",
+        continue: "متابعة", invalid: "يرجى إدخال قيمة صحيحة للمتابعة.", invalidDate: "اختر تاريخًا صالحًا اليوم أو بعده.",
+        dateOrder: "تاريخ العودة يجب أن يكون بعد تاريخ المغادرة.", directLabel: "مباشر", anyLabel: "أي خيار",
+        noPreference: "بدون تفضيل", dateLocale: "ar", count: (n, total) => `${n} / ${total}`,
+        itineraryTitle: "جدولك السياحي المقترح", smartLabel: "تخطيط ذكي فوري",
+        costSection: "التكلفة التقديرية وما تشمل", back: "رجوع",
+        itineraryLead: (destination, days) => `خطة ${days} ${days === 1 ? "يوم" : "أيام"} في ${destination}`,
+        dayLabel: (n) => `اليوم ${n}`, admission: "الأنشطة والدخول", meals: "الطعام", transport: "التنقل", stay: "الإقامة",
+        estimatedTrip: "إجمالي تقديري للمسافرين", perPerson: "لكل شخص في اليوم",
+        airfareNote: "التقديرات تشمل الأنشطة والطعام والتنقل والإقامة (على أساس مشاركة غرفة لشخصين)، ولا تشمل تذاكر الطيران أو التسوق. الأسعار تقريبية وليست أسعارًا مباشرة، وقد تختلف حسب الموسم والحجوزات. الأوقات مقترحة ويجب التحقق من مواعيد العمل والحجز. عند اختيار «أخرى» تظهر التقديرات بالريال السعودي.",
+        oneWayDurationNote: "لأن الرحلة ذهاب فقط، افترضنا إقامة تقديرية لمدة 3 أيام.",
+        dayTotal: "إجمالي اليوم للفرد", withinBudget: "الخطة ضمن ميزانيتك التقديرية.", overBudget: (amount) => `تتجاوز الميزانية المدخلة بنحو ${amount}.`,
+        noPrice: "مجاني", budgetNote: "التكلفة تقريبية وقد تزيد أو تنقص حسب اختياراتك.",
+        roundTrip: "ذهاب وعودة", oneWay: "ذهاب فقط",
+        summaryTitle: "تفاصيل الرحلة", summaryPrompt: "راجع الخطة والتكلفة التقديرية قبل إرسال طلبك للمكتب.",
+        currencies: [["USD", "دولار أمريكي (USD)"], ["SAR", "ريال سعودي (SAR)"], ["AED", "درهم إماراتي (AED)"], ["EUR", "يورو (EUR)"], ["GBP", "جنيه إسترليني (GBP)"], ["EGP", "جنيه مصري (EGP)"], ["KWD", "دينار كويتي (KWD)"], ["QAR", "ريال قطري (QAR)"], ["BHD", "دينار بحريني (BHD)"], ["OMR", "ريال عُماني (OMR)"], ["JOD", "دينار أردني (JOD)"], ["OTHER", "أخرى"]]
+      },
+      en: {
+        brand: "Rihal", brandTagline: "Travel, made simple", restart: "Start over", eyebrow: "Your personal travel assistant",
+        headline: "A better trip starts simply.", subtitle: "Answer a few easy questions and leave the trip planning to us. Clear and simple, one step at a time.",
+        heroNoteTitle: "Takes just minutes", heroNoteText: "One easy step at a time", assistant: "Rihal assistant", status: "Here to help",
+        sideTitle: "A few steps to a clearer trip", sideDescription: "We'll collect the essentials one step at a time. Restart or change language whenever you like.",
+        privacy: "Your trip details are shown for review before confirmation.",
+        stepNames: ["Destination", "Trip type", "Travelers", "Budget", "Preferences", "Confirm"],
+        hello: "Hi! I'm Rihal, and I'll help you plan one step at a time.",
+        destination: "Where would you like to go?",
+        destinationPlaceholder: "e.g. AlUla, Jeddah, Dubai, Cairo, Istanbul, Paris, or Tokyo",
+        tripType: "Is this round-trip or one-way?", roundTrip: "Round-trip", oneWay: "One-way",
+        departureDate: "When would you like to depart?", returnDate: "When would you like to return?", adults: "How many adult travelers?",
+        children: "And how many children?", budget: "What's your estimated trip budget?", budgetHint: "Amount",
+        currency: "Currency", currencyHint: "Choose a currency", flight: "Which flight option do you prefer?",
+        direct: "Direct flights", anyFlight: "Any option", hotel: "What hotel star rating do you prefer?",
+        anyStars: "No preference", stars: (n) => `${n} stars`, notes: "Any special activities or requests you'd like us to know?",
+        notesHint: "e.g. family-friendly activities or a hotel near the city center", skip: "Skip",
+        destinationLabel: "Destination", tripLabel: "Trip type", departLabel: "Departure", returnLabel: "Return",
+        travelersLabel: "Travelers", budgetLabel: "Budget", preferencesLabel: "Preferences",
+        adultsCount: (n) => `${n} adult${n === 1 ? "" : "s"}`, childrenCount: (n) => `${n} child${n === 1 ? "" : "ren"}`,
+        confirm: "Yes, confirm trip", startOver: "Start over",
+        successTitle: "Your request is confirmed!",
+        success: "Your request was saved and its details will be sent to the office email.",
+        emailWarning: "The request was saved, but its email notification could not be sent. It is available in the office dashboard.",
+        retryEmail: "Retry email notification",
+        storageError: "We couldn't send your request to the server. Check your connection and try again.",
+        continue: "Continue", invalid: "Please enter a valid value to continue.", invalidDate: "Choose a valid date today or later.",
+        dateOrder: "Return date must be after departure date.", directLabel: "Direct", anyLabel: "Any option",
+        noPreference: "No preference", dateLocale: "en", count: (n, total) => `${n} / ${total}`,
+        itineraryTitle: "Your suggested itinerary", smartLabel: "Instant smart plan",
+        costSection: "Estimated cost and what's included", back: "Back",
+        itineraryLead: (destination, days) => `${days}-day plan for ${destination}`,
+        dayLabel: (n) => `Day ${n}`, admission: "Activities & entry", meals: "Food", transport: "Local transit", stay: "Accommodation",
+        estimatedTrip: "Estimated total for your travelers", perPerson: "per person / day",
+        airfareNote: "Estimates cover activities, food, local transit, and accommodation (based on sharing a room for two). Flights and shopping aren't included. Prices are estimates, not live quotes, and vary by season and availability. Suggested times should be checked against opening hours and booking availability. Selecting “Other” displays estimates in SAR.",
+        oneWayDurationNote: "For a one-way trip, we assume a 3-day stay for this estimate.",
+        dayTotal: "Daily total per person", withinBudget: "This plan is within your estimated budget.", overBudget: (amount) => `This plan exceeds your entered budget by about ${amount}.`,
+        noPrice: "Free", budgetNote: "Costs are estimates and vary with your choices.",
+        currencies: [["USD", "US Dollar (USD)"], ["SAR", "Saudi Riyal (SAR)"], ["AED", "UAE Dirham (AED)"], ["EUR", "Euro (EUR)"], ["GBP", "British Pound (GBP)"], ["EGP", "Egyptian Pound (EGP)"], ["KWD", "Kuwaiti Dinar (KWD)"], ["QAR", "Qatari Riyal (QAR)"], ["BHD", "Bahraini Dinar (BHD)"], ["OMR", "Omani Rial (OMR)"], ["JOD", "Jordanian Dinar (JOD)"], ["OTHER", "Other"]]
+      }
+    };
+    const state = { lang: "ar", answers: {}, flow: [], index: 0, confirmed: false, requestId: null, pendingRequestId: null, pendingEmail: null, itinerary: null, typewriterTimer: null };
+    const messages = document.getElementById("messages");
+    const response = document.getElementById("response");
+    const steps = document.getElementById("steps");
+    const today = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    const t = (key) => words[state.lang][key];
+    const destinations = [
+      { aliases: ["العلا", "alula", "al ula"], ar: "العلا", en: "AlUla", meals: 125, transit: 75, lodging: 900, days: [
+        [["البلدة القديمة وواحة العلا", "AlUla Old Town and Oasis", 0], ["صخرة الفيل وقت الغروب", "Elephant Rock at sunset", 0]],
+        [["الحِجر (مدائن صالح) — جولة دخول", "Hegra (Madain Saleh) guided visit", 150], ["مواقع دادان وجبل عِكمة", "Dadan and Jabal Ikmah sites", 120]],
+        [["مطل حرة عويرض", "Harrat Viewpoint", 0], ["سوق البلدة القديمة", "Old Town market", 0]]
+      ] },
+      { aliases: ["الرياض", "riyadh"], ar: "الرياض", en: "Riyadh", meals: 135, transit: 70, lodging: 520, days: [
+        [["حي الطريف في الدرعية", "At-Turaif District in Diriyah", 50], ["البجيري وممشى الدرعية", "Bujairi Terrace and Diriyah walk", 0]],
+        [["المتحف الوطني السعودي", "National Museum of Saudi Arabia", 0], ["قصر المصمك وسوق الديرة", "Masmak Fortress and Al Dira market", 0]],
+        [["بوليفارد سيتي (تحقق من الموسم)", "Boulevard City (check seasonal opening)", 100], ["حديقة الملك عبدالله", "King Abdullah Park", 10]]
+      ] },
+      { aliases: ["جدة", "jeddah"], ar: "جدة", en: "Jeddah", meals: 125, transit: 65, lodging: 460, days: [
+        [["جدة التاريخية — البلد", "Historic Jeddah — Al-Balad", 0], ["بيت نصيف", "Nassif House", 20]],
+        [["كورنيش جدة ونافورة الملك فهد", "Jeddah Corniche and King Fahd Fountain", 0], ["جولة بحرية بالقارب", "Boat tour on the Red Sea", 100]],
+        [["أكواريوم فقيه", "Fakieh Aquarium", 65], ["واجهة جدة البحرية", "Jeddah Waterfront", 0]]
+      ] },
+      { aliases: ["دبي", "dubai"], ar: "دبي", en: "Dubai", meals: 155, transit: 75, lodging: 720, days: [
+        [["برج خليفة — تذكرة منصة المشاهدة", "Burj Khalifa observation deck", 180], ["نافورة دبي ودبي مول", "Dubai Fountain and Dubai Mall", 0]],
+        [["حي الفهيدي ومتحف دبي", "Al Fahidi Historical Neighbourhood and Dubai Museum", 15], ["عبور خور دبي بالعبّارة", "Dubai Creek abra crossing", 2]],
+        [["جولة قارب في مارينا دبي", "Dubai Marina boat tour", 100], ["شاطئ جميرا العام", "Jumeirah public beach", 0]]
+      ] },
+      { aliases: ["القاهرة", "cairo"], ar: "القاهرة", en: "Cairo", meals: 90, transit: 55, lodging: 390, days: [
+        [["أهرامات الجيزة ومنطقة أبو الهول", "Giza Pyramids and Sphinx area", 120], ["جولة هضبة الأهرامات", "Giza Plateau visit", 0]],
+        [["المتحف المصري في التحرير", "Egyptian Museum in Tahrir", 60], ["شارع المعز وخان الخليلي", "Al-Muizz Street and Khan el-Khalili", 0]],
+        [["جولة فلوكة في النيل", "Nile felucca ride", 55], ["حديقة الأزهر", "Al-Azhar Park", 20]]
+      ] },
+      { aliases: ["اسطنبول", "إسطنبول", "istanbul"], ar: "إسطنبول", en: "Istanbul", meals: 110, transit: 45, lodging: 520, days: [
+        [["آيا صوفيا", "Hagia Sophia", 100], ["جامع السلطان أحمد", "Sultan Ahmed Mosque", 0]],
+        [["قصر توبكابي", "Topkapi Palace", 150], ["البازار الكبير", "Grand Bazaar", 0]],
+        [["جولة عبّارة في البوسفور", "Bosphorus ferry cruise", 35], ["برج غلطة", "Galata Tower", 110]]
+      ] },
+      { aliases: ["باريس", "paris"], ar: "باريس", en: "Paris", meals: 190, transit: 65, lodging: 1050, days: [
+        [["متحف اللوفر", "Louvre Museum", 95], ["حديقة التويلري", "Tuileries Garden", 0]],
+        [["برج إيفل — تذكرة الصعود", "Eiffel Tower ticket", 120], ["نزهة في حدائق تروكاديرو", "Trocadero Gardens walk", 0]],
+        [["رحلة نهرية في السين", "Seine River cruise", 75], ["كاتدرائية نوتردام والمنطقة المحيطة", "Notre-Dame Cathedral area", 0]]
+      ] },
+      { aliases: ["طوكيو", "tokyo"], ar: "طوكيو", en: "Tokyo", meals: 145, transit: 55, lodging: 780, days: [
+        [["معبد سينسوجي وسوق ناكاميسي", "Senso-ji Temple and Nakamise Street", 0], ["ممشى نهر سوميدا", "Sumida River walk", 0]],
+        [["فريق لاب بلانيتس", "teamLab Planets", 125], ["سوق تويوسو", "Toyosu market", 0]],
+        [["ضريح ميجي وحديقة يويوغي", "Meiji Shrine and Yoyogi Park", 0], ["منصة طوكيو سكاي تري", "Tokyo Skytree observation deck", 90]]
+      ] },
+      { aliases: ["لندن", "london"], ar: "لندن", en: "London", meals: 180, transit: 80, lodging: 1150, days: [
+        [["المتحف البريطاني", "British Museum", 0], ["ميدان كوفنت غاردن", "Covent Garden", 0]],
+        [["برج لندن", "Tower of London", 150], ["جسر البرج", "Tower Bridge", 0]],
+        [["عين لندن", "London Eye", 150], ["منتزه هايد بارك", "Hyde Park", 0]]
+      ] },
+      { aliases: ["روما", "rome"], ar: "روما", en: "Rome", meals: 145, transit: 60, lodging: 780, days: [
+        [["الكولوسيوم والمنتدى الروماني", "Colosseum and Roman Forum", 100], ["ساحة فينيسيا", "Piazza Venezia", 0]],
+        [["متاحف الفاتيكان", "Vatican Museums", 100], ["ساحة القديس بطرس", "St. Peter's Square", 0]],
+        [["نافورة تريفي والبانثيون", "Trevi Fountain and Pantheon", 10], ["ساحة نافونا", "Piazza Navona", 0]]
+      ] }
+    ];
+    const currencyRates = { SAR: 1, USD: 3.75, AED: 1.02, EUR: 4.05, GBP: 4.78, EGP: 0.075, KWD: 12.2, QAR: 1.03, BHD: 9.95, OMR: 9.75, JOD: 5.29 };
+    function normalizeSearch(value) {
+      return value.toLocaleLowerCase().normalize("NFD").replace(/[\u0300-\u036f\u064b-\u065f]/g, "").trim();
+    }
+    function findDestination(value) {
+      const query = normalizeSearch(value);
+      return destinations.find((destination) => destination.aliases.some((alias) => query.includes(normalizeSearch(alias)))) || null;
+    }
+    function money(sarAmount) {
+      const currency = state.answers.currency || "SAR";
+      const amount = sarAmount / (currencyRates[currency] || 1);
+      if (currency === "OTHER") return `${Math.round(sarAmount).toLocaleString(words[state.lang].dateLocale)} SAR`;
+      return new Intl.NumberFormat(words[state.lang].dateLocale, { style: "currency", currency, maximumFractionDigits: 0 }).format(amount);
+    }
+    function tripLength() {
+      if (state.answers.tripType !== "round_trip") return 3;
+      const days = Math.round((new Date(`${state.answers.returnDate}T00:00:00Z`) - new Date(`${state.answers.departureDate}T00:00:00Z`)) / 86400000);
+      return Math.max(1, days);
+    }
+    function createItinerary() {
+      const a = state.answers;
+      const city = findDestination(a.destination);
+      const destinationName = city ? city[state.lang] : a.destination;
+      const length = tripLength();
+      const fallbackDays = [
+        [[`جولة في وسط ${destinationName}`, `Explore central ${destinationName}`, 0], [`زيارة متحف أو معلم محلي`, `Visit a local museum or landmark`, 40]],
+        [[`استكشاف السوق الشعبي في ${destinationName}`, `Explore a local market in ${destinationName}`, 0], [`زيارة حديقة أو ممشى المدينة`, `Visit a city park or promenade`, 0]],
+        [[`زيارة أبرز معالم ${destinationName}`, `Visit a major sight in ${destinationName}`, 60], [`تجربة مطبخ محلي`, `Try local cuisine`, 0]]
+      ];
+      const days = city ? city.days : fallbackDays;
+      const meals = city ? city.meals : 130;
+      const transit = city ? city.transit : 65;
+      const roomRate = city ? city.lodging : 560;
+      const starFactor = a.hotelStars === "3" ? 0.72 : a.hotelStars === "5" ? 1.8 : a.hotelStars === "4" ? 1 : 0.84;
+      const lodging = roomRate / 2 * starFactor;
+      const plans = Array.from({ length }, (_, index) => {
+        const places = days[index % days.length].map(([ar, en, cost], placeIndex) => ({
+          ar,
+          en,
+          name: state.lang === "ar" ? ar : en,
+          cost,
+          time_ar: placeIndex === 0 ? "9:00 ص — وقت مقترح" : "4:30 م — وقت مقترح",
+          time_en: placeIndex === 0 ? "9:00 AM — suggested" : "4:30 PM — suggested",
+          time: state.lang === "ar"
+            ? placeIndex === 0 ? "9:00 ص — وقت مقترح" : "4:30 م — وقت مقترح"
+            : placeIndex === 0 ? "9:00 AM — suggested" : "4:30 PM — suggested",
+          url: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${state.lang === "ar" ? ar : en} ${destinationName}`)}`
+        }));
+        const admission = places.reduce((sum, place) => sum + place.cost, 0);
+        return { number: index + 1, places, admission, meals, transit, lodging, total: admission + meals + transit + lodging };
+      });
+      const adults = Number(a.adults || 1);
+      const children = Number(a.children || 0);
+      const travelers = adults + children * 0.65;
+      const total = plans.reduce((sum, day) => sum + day.total, 0) * travelers;
+      return { destination: destinationName, days: plans, duration: length, total, travelers: adults + children, adults, children, catalogMatch: Boolean(city) };
+    }
+    function element(tag, className, text) {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text !== undefined) node.textContent = text;
+      return node;
+    }
+    function renderItinerary() {
+      const itinerary = state.itinerary;
+      const card = element("section", "itinerary");
+      card.setAttribute("aria-label", t("itineraryTitle"));
+      const head = element("div", "itinerary-head");
+      const heading = element("div");
+      heading.append(element("h2", "itinerary-title", t("itineraryTitle")), element("p", "itinerary-subtitle", t("itineraryLead")(itinerary.destination, itinerary.duration)));
+      head.append(heading, element("span", "smart-badge", t("smartLabel")));
+      card.append(head);
+      const budgetInSar = Number(state.answers.budget) * (currencyRates[state.answers.currency] || 1);
+      const costs = element("section", "cost-section");
+      costs.append(element("h3", "", t("costSection")));
+      const estimate = element("div", "trip-estimate");
+      estimate.append(element("span", "", `${t("estimatedTrip")} · ${itinerary.travelers} ${t("travelersLabel")}`), element("strong", "", money(itinerary.total)));
+      costs.append(estimate);
+      costs.append(element("p", "price-note", itinerary.total <= budgetInSar
+        ? t("withinBudget")
+        : t("overBudget")(money(itinerary.total - budgetInSar))));
+      costs.append(element("p", "price-note", `${t("airfareNote")}${state.answers.tripType === "one_way" ? ` ${t("oneWayDurationNote")}` : ""}`));
+      if (!itinerary.catalogMatch) {
+        costs.append(element("p", "price-note", state.lang === "ar"
+          ? "لم نعثر على هذه الوجهة في دليلنا المختصر؛ أعددنا برنامجًا عامًا، وروابط الأماكن تفتح بحث الخرائط للتحقق من المواقع."
+          : "This destination isn't in our compact guide. We've prepared a general plan; use the map links to check local places."));
+      }
+      card.append(costs);
+      itinerary.days.forEach((day) => {
+        const dayNode = document.createElement("details");
+        dayNode.className = "day-plan";
+        dayNode.open = !window.matchMedia("(max-width: 680px)").matches;
+        dayNode.append(element("summary", "day-title", t("dayLabel")(day.number)));
+        const content = element("div", "day-content");
+        day.places.forEach((place) => {
+          const activity = element("div", "plan-activity");
+          const placeInfo = element("div", "activity-place");
+          const link = element("a", "", place.name);
+          link.href = place.url;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          placeInfo.append(element("span", "activity-time", place.time), link);
+          activity.append(placeInfo, element("span", "activity-price", place.cost ? money(place.cost) : t("noPrice")));
+          content.append(activity);
+        });
+        const dayCosts = element("div", "day-costs");
+        [[t("admission"), day.admission], [t("meals"), day.meals], [t("transport"), day.transit], [t("stay"), day.lodging], [t("dayTotal"), day.total]].forEach(([label, amount]) => {
+          const item = element("div", "cost-item");
+          item.append(element("span", "", label), element("strong", "", money(amount)));
+          dayCosts.append(item);
+        });
+        content.append(dayCosts);
+        dayNode.append(content);
+        card.append(dayNode);
+      });
+      return card;
+    }
+
+    function buildFlow() {
+      state.flow = ["destination", "tripType", "departureDate"];
+      if (state.answers.tripType === "round_trip") state.flow.push("returnDate");
+      state.flow.push("adults", "children", "budget", "currency", "flight", "hotel", "notes", "confirmation");
+    }
+    function addMessage(content, role = "bot") {
+      const el = document.createElement("div");
+      el.className = `bubble ${role}`;
+      el.textContent = content;
+      messages.append(el);
+      messages.scrollTop = messages.scrollHeight;
+    }
+    function currentStep() {
+      return state.flow[state.index] === "confirmation" || state.confirmed ? 5 : state.index < 2 ? 0 : state.index < 4 ? 1 : state.index < 6 ? 2 : state.index < 8 ? 3 : 4;
+    }
+    function progress() {
+      const current = currentStep();
+      steps.innerHTML = "";
+      t("stepNames").forEach((label, i) => {
+        const el = document.createElement("div");
+        el.className = `step${i === current ? " active" : i < current ? " done" : ""}`;
+        el.innerHTML = `<span class="step-number">${i < current ? "✓" : i + 1}</span><span>${label}</span>`;
+        steps.append(el);
+      });
+      const total = state.flow.length || 11;
+      document.getElementById("count").textContent = t("count")(Math.min(state.index + 1, total), total);
+      document.getElementById("fill").style.width = `${state.confirmed ? 100 : Math.min(95, state.index / total * 100)}%`;
+      document.getElementById("restart").hidden = state.index === 0 && !state.confirmed;
+    }
+    function setLanguage(lang) {
+      state.lang = lang;
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+      document.title = lang === "ar" ? "رِحال — رحلة أحلى تبدأ بخطوة" : "Rihal — Plan your trip";
+      document.querySelectorAll("[data-copy]").forEach((el) => { el.textContent = t(el.dataset.copy); });
+      document.getElementById("language").textContent = lang === "ar" ? "English" : "العربية";
+      if (!state.confirmed && state.index === 0) {
+        messages.innerHTML = "";
+        ask();
+      }
+      progress();
+      if (state.confirmed) showConfirmation();
+      else if (state.index > 0) ask();
+    }
+    function choices(items, onSelect) {
+      const list = document.createElement("div");
+      list.className = "choices";
+      items.forEach(([value, label]) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "choice";
+        button.textContent = label;
+        button.addEventListener("click", () => onSelect(value, label), { once: true });
+        list.append(button);
+      });
+      response.append(list);
+      addBackButton();
+    }
+    function addBackButton(container = response) {
+      if (state.index === 0) return;
+      const actions = element("div", "question-actions");
+      const back = element("button", "back-button", t("back"));
+      back.type = "button";
+      back.addEventListener("click", () => {
+        state.index--;
+        progress();
+        ask();
+      });
+      actions.append(back);
+      container.append(actions);
+    }
+    function answer(value) {
+      const key = state.flow[state.index];
+      const answerKey = { flight: "flightPreference", hotel: "hotelStars", notes: "specialNotes" }[key] || key;
+      state.answers[answerKey] = value;
+      state.index++;
+      progress();
+      ask();
+    }
+    function typeQuestion(target, text, onComplete) {
+      clearTimeout(state.typewriterTimer);
+      target.classList.add("typing-text");
+      target.textContent = "";
+      const characters = Array.from(text);
+      let index = 0;
+      const finish = () => {
+        target.classList.remove("typing-text");
+        state.typewriterTimer = null;
+        onComplete();
+      };
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        target.textContent = text;
+        finish();
+        return;
+      }
+      const typeNext = () => {
+        if (index >= characters.length) {
+          finish();
+          return;
+        }
+        target.textContent += characters[index++];
+        state.typewriterTimer = setTimeout(typeNext, 38);
+      };
+      typeNext();
+    }
+    function ask() {
+      clearTimeout(state.typewriterTimer);
+      state.typewriterTimer = null;
+      messages.innerHTML = "";
+      messages.classList.remove("has-results");
+      response.innerHTML = "";
+      if (state.index >= state.flow.length) return;
+      const key = state.flow[state.index];
+      progress();
+      if (key === "confirmation") {
+        state.itinerary = createItinerary();
+        showSummary();
+        return;
+      }
+      const questionText = t(key);
+      const card = element("section", "question-card");
+      const stepLabel = t("stepNames")[currentStep()];
+      const progressLabel = element("div", "question-progress", stepLabel);
+      progressLabel.append(element("span", "question-progress-count", t("count")(Math.min(state.index + 1, state.flow.length), state.flow.length)));
+      const progressTrack = element("div", "question-progress-track");
+      const progressFill = element("div", "question-progress-fill");
+      progressFill.style.width = `${Math.min(100, (state.index + 1) / state.flow.length * 100)}%`;
+      progressTrack.append(progressFill);
+      const question = element("h1", "question-text");
+      question.setAttribute("aria-label", questionText);
+      const typedText = element("span", "typing-text");
+      question.append(typedText);
+      card.append(progressLabel, progressTrack, question);
+      card.append(response);
+      messages.append(card);
+      typeQuestion(typedText, questionText, () => {
+        if (key === "tripType") {
+          choices([["round_trip", t("roundTrip")], ["one_way", t("oneWay")]], (value) => {
+            state.answers.tripType = value;
+            buildFlow();
+            answer(value);
+          });
+          return;
+        }
+        if (key === "flight") {
+          choices([["direct", t("direct")], ["any", t("anyFlight")]], (value) => answer(value));
+          return;
+        }
+        if (key === "hotel") {
+          choices([["", t("anyStars")], ...[3, 4, 5].map((n) => [String(n), t("stars")(n)])], (value) => answer(value || null));
+          return;
+        }
+        renderForm(key);
+      });
+    }
+    function renderForm(key) {
+      const form = document.createElement("form");
+      const error = document.createElement("div");
+      error.className = "error";
+      error.setAttribute("role", "alert");
+      const submit = document.createElement("button");
+      submit.type = "submit";
+      submit.className = "primary";
+      submit.textContent = t("continue");
+      const actions = element("div", "question-actions");
+      actions.append(submit);
+      if (state.index > 0) {
+        const back = element("button", "back-button", t("back"));
+        back.type = "button";
+        back.addEventListener("click", () => {
+          state.index--;
+          progress();
+          ask();
+        });
+        actions.append(back);
+      }
+      let input;
+      if (key === "budget" || key === "currency") {
+        const row = document.createElement("div");
+        row.className = "row";
+        if (key === "budget") {
+          input = document.createElement("input");
+          input.type = "number";
+          input.min = "0.01";
+          input.step = "0.01";
+          input.inputMode = "decimal";
+          input.placeholder = t("budgetHint");
+          input.className = "input";
+        } else {
+          input = document.createElement("select");
+          input.className = "input";
+          const placeholder = document.createElement("option");
+          placeholder.value = "";
+          placeholder.textContent = t("currencyHint");
+          placeholder.disabled = true;
+          placeholder.selected = true;
+          input.append(placeholder);
+          t("currencies").forEach(([value, label]) => {
+            const option = document.createElement("option");
+            option.value = value;
+            option.textContent = label;
+            input.append(option);
+          });
+        }
+        row.append(input);
+        form.append(row, error, actions);
+      } else if (key === "notes") {
+        input = document.createElement("textarea");
+        input.maxLength = 400;
+        input.placeholder = t("notesHint");
+        actions.className += " notes-actions";
+        const skip = document.createElement("button");
+        skip.type = "button";
+        skip.className = "choice";
+        skip.textContent = t("skip");
+        skip.addEventListener("click", () => answer(null, t("skip")));
+        actions.append(skip);
+        form.append(input, error, actions);
+      } else {
+        input = document.createElement("input");
+        input.type = key.endsWith("Date") ? "date" : key === "destination" ? "text" : "number";
+        input.className = "input";
+        if (key === "destination") {
+          input.placeholder = t("destinationPlaceholder");
+          input.maxLength = 120;
+        } else if (input.type === "date") {
+          input.min = today;
+        } else {
+          input.min = key === "adults" ? "1" : "0";
+          input.max = "99";
+          input.step = "1";
+          input.placeholder = "0";
+        }
+        form.append(input, error, actions);
+      }
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const value = input.value.trim();
+        if (key === "notes") {
+          answer(value || null, value || t("skip"));
+          return;
+        }
+        if (!value) {
+          error.textContent = t("invalid");
+          input.focus();
+          return;
+        }
+        if (key === "departureDate" || key === "returnDate") {
+          if (value < today) {
+            error.textContent = t("invalidDate");
+            return;
+          }
+          if (key === "returnDate" && value <= state.answers.departureDate) {
+            error.textContent = t("dateOrder");
+            return;
+          }
+          answer(value, new Intl.DateTimeFormat(words[state.lang].dateLocale, { dateStyle: "long", timeZone: "UTC" }).format(new Date(`${value}T00:00:00Z`)));
+          return;
+        }
+        if (key === "adults" || key === "children") {
+          const number = Number(value);
+          if (!Number.isInteger(number) || number < Number(input.min) || number > 99) {
+            error.textContent = t("invalid");
+            input.focus();
+            return;
+          }
+          answer(number, value);
+          return;
+        }
+        if (key === "budget") {
+          const amount = Number(value);
+          if (!Number.isFinite(amount) || amount <= 0) {
+            error.textContent = t("invalid");
+            input.focus();
+            return;
+          }
+          answer(amount, value);
+          return;
+        }
+        const currency = t("currencies").find(([code]) => code === value);
+        answer(value, currency ? currency[1] : value);
+      });
+      const answerKey = { flight: "flightPreference", hotel: "hotelStars", notes: "specialNotes" }[key] || key;
+      if (state.answers[answerKey] !== undefined && state.answers[answerKey] !== null) input.value = state.answers[answerKey];
+      form.insertBefore(error, form.lastElementChild);
+      response.append(form);
+      if (input) input.focus({ preventScroll: true });
+    }
+    function dateLabel(value) {
+      return new Intl.DateTimeFormat(words[state.lang].dateLocale, { dateStyle: "long", timeZone: "UTC" }).format(new Date(`${value}T00:00:00Z`));
+    }
+    function showSummary() {
+      messages.classList.add("has-results");
+      const a = state.answers;
+      const lines = [
+        `${t("destinationLabel")}: ${a.destination}`,
+        `${t("tripLabel")}: ${a.tripType === "round_trip" ? t("roundTrip") : t("oneWay")}`,
+        `${t("departLabel")}: ${dateLabel(a.departureDate)}`,
+        ...(a.tripType === "round_trip" ? [`${t("returnLabel")}: ${dateLabel(a.returnDate)}`] : []),
+        `${t("travelersLabel")}: ${t("adultsCount")(a.adults)}${a.children ? `، ${t("childrenCount")(a.children)}` : ""}`,
+        `${t("budgetLabel")}: ${a.budget} ${a.currency}`,
+        `${t("preferencesLabel")}: ${a.flightPreference === "direct" ? t("directLabel") : t("anyLabel")}, ${a.hotelStars ? t("stars")(Number(a.hotelStars)) : t("noPreference")}${a.specialNotes ? `\n${a.specialNotes}` : ""}`
+      ];
+      const heading = element("h1", "question-text", t("summaryTitle"));
+      const subtitle = element("p", "question-hint", t("summaryPrompt"));
+      const summary = element("div", "summary-box", lines.join("\n"));
+      messages.append(heading, subtitle, summary, renderItinerary());
+      document.querySelector(".chat").append(response);
+      choices([["yes", t("confirm")]], () => {
+        state.confirmed = true;
+        submitRequest();
+      });
+    }
+    function createPayload() {
+      const a = state.answers;
+      return {
+        request_status: "confirmed",
+        language: state.lang,
+        destination: a.destination,
+        trip_type: a.tripType,
+        departure_date: a.departureDate,
+        return_date: a.tripType === "round_trip" ? a.returnDate : null,
+        travelers: { adults: a.adults, children: a.children },
+        budget: { amount: a.budget, currency: a.currency },
+        itinerary: {
+          duration_days: state.itinerary.duration,
+          estimated_total: Math.round(state.itinerary.total / (currencyRates[a.currency] || 1)),
+          currency: a.currency === "OTHER" ? "SAR" : a.currency,
+          prices_are_estimates: true,
+          airfare_included: false,
+          days: state.itinerary.days.map((day) => ({
+            day: day.number,
+            activities: day.places.map((place) => ({
+              name: place.name,
+              name_ar: place.ar,
+              name_en: place.en,
+              estimated_time_ar: place.time_ar,
+              estimated_time_en: place.time_en,
+              estimated_entry_cost: Math.round(place.cost / (currencyRates[a.currency] || 1)),
+              estimated_time: place.time
+            })),
+            estimated_meals: Math.round(day.meals / (currencyRates[a.currency] || 1)),
+            estimated_local_transport: Math.round(day.transit / (currencyRates[a.currency] || 1)),
+            estimated_accommodation_per_person: Math.round(day.lodging / (currencyRates[a.currency] || 1)),
+            estimated_day_total_per_person: Math.round(day.total / (currencyRates[a.currency] || 1))
+          }))
+        },
+        preferences: {
+          hotel_stars: a.hotelStars || null,
+          flight_preference: a.flightPreference,
+          special_notes: a.specialNotes || null
+        }
+      };
+    }
+    function sendRequestEmail(requestId, payload) {
+      const { publicKey, serviceId, templateId } = emailjsConfig;
+      if ([publicKey, serviceId, templateId].some((value) => !value || value.startsWith("YOUR_EMAILJS_"))) {
+        throw new Error("EmailJS is not configured. Set its public key, service ID, and template ID in emailjs-config.js.");
+      }
+      if (!window.emailjs) throw new Error("EmailJS SDK did not load.");
+
+      const params = {
+        request_id: requestId,
+        destination: payload.destination,
+        trip_type: payload.trip_type,
+        departure_date: payload.departure_date,
+        return_date: payload.return_date || "—",
+        adults: payload.travelers.adults,
+        children: payload.travelers.children,
+        budget_amount: payload.budget.amount,
+        budget_currency: payload.budget.currency,
+        flight_preference: payload.preferences.flight_preference,
+        hotel_stars: payload.preferences.hotel_stars || "—",
+        special_notes: payload.preferences.special_notes || "—",
+        request_details: JSON.stringify(payload, null, 2)
+      };
+      return window.emailjs.send(serviceId, templateId, params, { publicKey });
+    }
+
+    async function submitRequest() {
+      const confirmButton = response.querySelector(".choice");
+      if (confirmButton) confirmButton.disabled = true;
+      try {
+        if (!window.crypto?.randomUUID) throw new Error("Secure random IDs require HTTPS.");
+        state.pendingRequestId ||= `RH-${crypto.randomUUID()}`;
+        
+        // الاتصال المباشر بقاعدة بيانات Firestore المجانية
+        const { getFirestore, collection, addDoc } = await import("https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js");
+        const { getApp } = await import("https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js");
+        
+        const db = getFirestore(getApp());
+        
+        // تجهيز بيانات الطلب وإرسالها مباشرة إلى مجموعة "travelRequests"
+        const payload = createPayload();
+        await addDoc(collection(db, "travelRequests"), {
+          requestId: state.pendingRequestId,
+          ...payload,
+          createdAt: new Date().toISOString()
+        });
+
+        const requestId = state.pendingRequestId;
+        state.requestId = requestId;
+        state.pendingRequestId = null;
+        state.pendingEmail = { requestId, payload };
+        state.confirmed = true;
+        progress();
+        let emailSent = false;
+        try {
+          await sendRequestEmail(requestId, payload);
+          state.pendingEmail = null;
+          emailSent = true;
+        } catch (error) {
+          console.error("Could not send travel request email notification.", error);
+        }
+        showConfirmation(emailSent);
+      } catch (error) {
+        console.error("Could not submit travel request to Firebase.", error);
+        if (confirmButton) confirmButton.disabled = false;
+        let notice = response.querySelector(".submission-error");
+        if (!notice) {
+          notice = element("div", "error submission-error");
+          notice.setAttribute("role", "alert");
+          response.prepend(notice);
+        }
+        notice.textContent = t("storageError");
+      }
+    }
+    function showConfirmation(emailSent) {
+      response.innerHTML = "";
+      messages.innerHTML = "";
+      messages.classList.add("has-results");
+      messages.append(element("h1", "question-text", t("successTitle")), element("p", "question-hint", t("success")), renderItinerary());
+      document.querySelector(".chat").append(response);
+      const card = document.createElement("section");
+      card.className = "success-card";
+      const title = document.createElement("strong");
+      title.textContent = t("successTitle");
+      const description = document.createElement("p");
+      description.textContent = t("success");
+      card.append(title, description);
+      if (!emailSent) {
+        card.append(element("p", "price-note", t("emailWarning")));
+        const retry = element("button", "choice", t("retryEmail"));
+        retry.type = "button";
+        retry.addEventListener("click", async () => {
+          retry.disabled = true;
+          try {
+            if (!state.pendingEmail) throw new Error("No saved request is available to retry its email notification.");
+            await sendRequestEmail(state.pendingEmail.requestId, state.pendingEmail.payload);
+            state.pendingEmail = null;
+            showConfirmation(true);
+          } catch (error) {
+            console.error("Could not retry travel request email notification.", error);
+            retry.disabled = false;
+          }
+        });
+        card.append(retry);
+      }
+      response.append(card);
+      messages.scrollTop = messages.scrollHeight;
+    }
+    function restart() {
+      state.answers = {};
+      state.index = 0;
+      state.confirmed = false;
+      state.requestId = null;
+      state.pendingRequestId = null;
+      state.pendingEmail = null;
+      state.itinerary = null;
+      buildFlow();
+      messages.innerHTML = "";
+      response.innerHTML = "";
+      progress();
+      ask();
+    }
+    document.getElementById("language").addEventListener("click", () => setLanguage(state.lang === "ar" ? "en" : "ar"));
+    document.getElementById("restart").addEventListener("click", restart);
+    buildFlow();
+    setLanguage("ar");
+  </script>
+  
+</body>
+</html>
